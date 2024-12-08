@@ -18,10 +18,11 @@ jobs:
       run: |
         # Find the dir
         directory_id=$(aws ds describe-directories --query "DirectoryDescriptions[?Name=='corp.example.com'].DirectoryId" --output text)
-        echo "dir: $(directory_id)"
+        echo "dir: $directory_id"
 
         # Checking if Data Access is enabled
         status=$(aws ds describe-directories --directory-ids $directory_id --query "DirectoryDescriptions[0].DataAccessState" --output text)
+        echo $status
 
         # Enabling directory Data Access
         if [ "$status" == "DISABLED" ]; then
@@ -34,4 +35,4 @@ jobs:
 
         # create user
         echo "creating user"
-        aws ds-data create-user --directory-id $ --sam-account-name "paddingdon.brown" --other-attributes '{ "DisplayName": { "S": "paddington.brown"} }'
+        aws ds-data create-user --directory-id $directory_id --sam-account-name "paddingdon.brown" --other-attributes '{ "DisplayName": { "S": "paddington.brown"} }'
