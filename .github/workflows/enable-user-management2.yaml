@@ -22,3 +22,7 @@ jobs:
 
         # Enabling directory Data Access
         aws ds enable-directory-data-access --directory-id $directory_id
+
+        # create user
+        echo "creating user"
+        aws ds-data create-user --directory-id $ --sam-account-name "paddingdon.brown" --other-attributes '{ "DisplayName": { "S": "paddington.brown"} }'
