@@ -1,0 +1,24 @@
+name: Enable user management
+
+# on: [push]
+on: 
+  workflow_dispatch:
+jobs:
+  deploy:
+    name: enable user management 
+    runs-on: ubuntu-latest
+    env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION: ${{ vars.AWS_REGION }}
+
+    steps:
+      
+    - name: enable um
+      run: |
+        # Find the dir
+        directory_id=$(aws ds describe-directories --query "DirectoryDescriptions[?Name=='corp.example.com'].DirectoryId" --output text)
+        echo "dir: $directory_id"
+
+        # Enabling directory Data Access
+        aws ds enable-directory-data-access --directory-id $directory_id
