@@ -24,14 +24,12 @@ jobs:
         status=$(aws ds describe-directories --directory-ids $directory_id --query "DirectoryDescriptions[0].DataAccessState" --output text)
         echo $status
 
+        # temporarily disable the script's default behavior of exiting on errors 
+        set +e
         # Enabling directory Data Access
-        if [ "$status" == "DISABLED" ]; then
-            echo "Directory data access is disabled. Enabling it now..."
-            aws ds enable-directory-data-access --directory-id $directory_id
-            echo "Directory data access has been enabled."
-        else
-            echo "Directory data access is already enabled. No action needed."
-        fi
+        aws ds enable-directory-data-access --directory-id $directory_id
+        set -e
+        
 
         # create user
         echo "creating user"
