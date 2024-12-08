@@ -18,7 +18,11 @@ jobs:
       run: |
         # Find the dir
         directory_id=$(aws ds describe-directories --query "DirectoryDescriptions[?Name=='corp.example.com'].DirectoryId" --output text)
-        echo "dir: $directory_id"
+        echo "dir: $(directory_id)"
 
         # Enabling directory Data Access
         aws ds enable-directory-data-access --directory-id $directory_id
+
+        # create user
+        echo "creating user"
+        aws ds-data create-user --directory-id $ --sam-account-name "paddingdon.brown" --other-attributes '{ "DisplayName": { "S": "paddington.brown"} }'
