@@ -1,0 +1,20 @@
+Resources:
+  awsManagedMicrosoftAD:
+    Type: AWS::DirectoryService::MicrosoftAD
+    Properties: 
+      Name: "corp.example.com"
+      Edition: Standard
+      Password: !Ref DirectoryPassword 
+      ShortName: "CORP"
+      VpcSettings: 
+        SubnetIds: 
+          - !ImportValue subnet1IdExport
+          - !ImportValue subnet2IdExport
+        VpcId: 
+          !ImportValue vpcExport
+
+Parameters:
+  DirectoryPassword:
+    Description: Password for AD directory
+    Type: String
+    NoEcho: true

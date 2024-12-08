@@ -1,0 +1,57 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudFormation template to create a VPC with two subnets in different availability zones.
+
+Resources:
+  # VPC
+  dirSvcVpc:
+    Type: AWS::EC2::VPC
+    Properties: 
+      CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: dirSvcVpc
+
+  # Subnet 1
+  Subnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref dirSvcVpc
+      CidrBlock: 10.0.1.0/24
+      AvailabilityZone: !Select [0, !GetAZs '']
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: dir-svc-subnet1
+
+  # Subnet 2
+  Subnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref dirSvcVpc
+      CidrBlock: 10.0.2.0/24
+      AvailabilityZone: !Select [1, !GetAZs '']
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: dir-svc-subnet2
+
+Outputs:
+  VPCId:
+    Description: The ID of the created VPC
+    Value: !Ref dirSvcVpc
+    Export:
+      Name: vpcExport
+
+  Subnet1Id:
+    Description: The ID of the first subnet
+    Value: !Ref Subnet1
+    Export:
+      Name: subnet1IdExport
+
+  Subnet2Id:
+    Description: The ID of the second subnet
+    Value: !Ref Subnet2
+    Export:
+      Name: subnet2IdExport
