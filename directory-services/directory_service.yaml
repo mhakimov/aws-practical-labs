@@ -13,6 +13,70 @@ Resources:
         VpcId: 
           !ImportValue vpcExport
 
+  EC2DomainJoinRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: EC2DomainJoin
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+        - arn:aws:iam::aws:policy/AmazonSSMDirectoryServiceAccess
+
+  EC2DomainJoinProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref EC2DomainJoinRole
+
+  InstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow SSH access
+      VpcId: !ImportValue vpcExport # Reference your VPC
+      SecurityGroupEgress:
+        - CidrIp: "0.0.0.0/0"  # Allow all outbound traffic
+          IpProtocol: "-1"      # -1 means all protocols
+      SecurityGroupIngress:
+        - CidrIp: "0.0.0.0/0"  # Allow all inbound traffic
+          IpProtocol: "-1" 
+
+  # WindowsServerInstance:
+  #   Type: AWS::EC2::Instance
+  #   Properties:
+  #     InstanceType: t3.micro 
+  #     ImageId: ami-0a5bc3380750d6551 #Microsoft Windows Server 2019 Base 
+  #     KeyName: minem-pair #!Ref KeyPairName # Replace this or set the parameter for your key pair
+  #     SecurityGroupIds:
+  #       - !Ref InstanceSecurityGroup
+  #     IamInstanceProfile: !Ref EC2DomainJoinProfile
+  #     SubnetId: !ImportValue subnet1IdExport
+  #     Tags:
+  #       - Key: Name
+  #         Value: WindowsServer
+
+  # DomainJoinAssociation:
+  #   Type: AWS::SSM::Association
+  #   Properties:
+  #     Name: AWS-JoinDirectoryServiceDomain
+  #     InstanceId: !Ref WindowsServerInstance
+  #     Parameters:
+  #       directoryId:
+  #         - "d-9c676daf18" #!Ref awsManagedMicrosoftAD #"d-xxxxxxxxxx" # Replace with your Directory Service ID
+  #       directoryName:
+  #         - "corp.example.com" 
+  #       dnsIpAddresses: 
+  #         - 10.0.1.4
+  #         - 10.0.2.211 #!GetAtt awsManagedMicrosoftAD.DnsIpAddresses
+  #     DocumentVersion: "$LATEST"
+
 Parameters:
   DirectoryPassword:
     Description: Password for AD directory
